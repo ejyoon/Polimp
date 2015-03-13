@@ -39,7 +39,8 @@ function shuffle (a)
 // substitution function - do we want to save all these factors to a data object? FIXME
 function doSentSubs (sents, scale, domain)
 {
-    inference = sents["scales"][scale]["sent_utterance"];
+    QUD = sents["scales"][scale]["sent_QUD"];
+    utterance = sents["scales"][scale]["sent_utterance"];
     question = sents["scales"][scale]["sent_question"];
     context = sents["domains"][domain]["sent_context"];
  
@@ -47,13 +48,14 @@ function doSentSubs (sents, scale, domain)
     LS = sents["domains"][domain]["LS"]; //Listener
     AA = sents["domains"][domain]["AA"]; //Item 1
     BB = sents["domains"][domain]["BB"]; //Item 2
+    AB = sents["domains"][domain]["AB"]; //Item 1&2
  
-    inference = inference.replace("SP",SP).replace("LS",LS).replace("AA",AA).replace("BB",BB);
-
-    question = question.replace("SP",SP).replace("LS",LS).replace("LS",LS).replace("AA",AA).replace("BB",BB);
-    context = context.replace("SP",SP).replace("LS",LS).replace("LS",LS).replace("AA",AA).replace("BB",BB);
+    QUD = QUD.replace("SP",SP).replace("LS",LS).replace("AA",AA).replace("BB",BB).replace("AB",AB);
+    utterance = utterance.replace("SP",SP).replace("LS",LS).replace("AA",AA).replace("BB",BB).replace("AB",AB);
+    question = question.replace("SP",SP).replace("LS",LS).replace("LS",LS).replace("AA",AA).replace("BB",BB).replace("AB",AB);
+    context = context.replace("SP",SP).replace("LS",LS).replace("LS",LS).replace("AA",AA).replace("BB",BB).replace("AB",AB);
     
-     return [inference, question, context, SP, LS];
+     return [utterance, question, context, SP, LS, QUD];
 }
 
 
@@ -74,52 +76,53 @@ speakers10 = shuffle(speakers[9]);
 var sents = {
     scales: {
 		training1: {
-		    sent_manipulation: null,
+            sent_QUD: "What do you enjoy doing in your free time?",
 		    sent_utterance: "I like reading books.",
 		    sent_question:  "SP also likes watching movies?"
 		},	
 	   training2: {
-		    sent_manipulation: null,
+            sent_QUD: "What kind of food do you not like?",
 		    sent_utterance: "I don't like eating vegetables.",
 		    sent_question:  "SP doesn't like eating carrots?"
 		},	
         sayHAinferLB: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my AB?",
             sent_utterance: "People hated your AA.", 
             sent_question: "people did not hate LS's BB?"
         },
         sayHAinferHB: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my AB?",
             sent_utterance: "People hated your BB.", 
             sent_question: "people also did not like LS's AA?"
         },
         sayLAinferLB: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my AB?",
             sent_utterance: "People loved your AA.", 
             sent_question: "people also liked LS's BB?"
         },
         sayLAinferHB: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my AB?",
             sent_utterance: "People loved your BB.", 
             sent_question: "people did not like LS's AA?"
         },
         saySomeHinferAllH: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my AA?",
             sent_utterance: "Some people hated your AA.", 
             sent_question: "no one liked LS's AA?"
         },
         saySomeHinferAllL: {
             sent_manipulation: null,
+            sent_QUD: "Did people like my BB?",
             sent_utterance: "Some people hated your BB.", 
             sent_question: "someone liked LS's BB?"
         },
         saySomeLinferAllL: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my AA?",
             sent_utterance: "Some people loved your AA.", 
             sent_question: "everyone liked LS's AA?"
         },
         saySomeLinferAllH: {
-            sent_manipulation: null,
+            sent_QUD: "Did people like my BB?",
             sent_utterance: "Some people loved your BB.", 
             sent_question: "someone did not like LS's BB?"
         }
@@ -143,6 +146,7 @@ var sents = {
 	    LS: speakers3[1],
 	    AA: "cookies",
 	    BB: "tea",
+        AB: "cookies and tea"
 	},
 	games: {
 	    sent_context: "SP and LS were talking about games and puzzles that LS had suggested for a welcome event for their company.",
@@ -150,6 +154,7 @@ var sents = {
 	    LS: speakers4[1],
 	    AA: "games",
 	    BB: "puzzles",
+        AB: "games and puzzles"        
 	},
 	poems: {
 	    sent_context: "SP and LS were talking about poems and stories that LS wrote and presented for his English class.",
@@ -157,6 +162,7 @@ var sents = {
 	    LS: speakers5[0],
 	    AA: "poems",
 	    BB: "stories",
+        AB: "poems and stories"
 	},
 	books: {
 	    sent_context: "SP and LS were talking about books and movies that LS had recommended to people at a party.",
@@ -164,6 +170,7 @@ var sents = {
 	    LS: speakers6[0],
 	    AA: "book recommendations",
 	    BB: "movie recommendations",
+        AB: "book and movie recommendations"
 	},
     handouts: {
 	    sent_context: "SP and LS were talking about handouts and activities that LS had made for teaching students in history class.",
@@ -171,6 +178,7 @@ var sents = {
 	    LS: speakers7[0],
 	    AA: "handouts",
 	    BB: "activities",
+        AB: "handouts and activities"
 	},
     soup: {
 	    sent_context: "SP and LS were talking about soup and salad that LS had prepared for a dinner party.",
@@ -178,6 +186,7 @@ var sents = {
 	    LS: speakers8[0],
 	    AA: "soup",
 	    BB: "salad",
+        AB: "soup and salad"
 	},
     cards: {
 	    sent_context: "SP and LS were talking about cards and flowers that LS had prepared for a graduating class of students.",
@@ -185,6 +194,7 @@ var sents = {
 	    LS: speakers9[0],
 	    AA: "cards",
 	    BB: "flowers",
+        AB: "cards and flowers"
 	},
     drawings: {
 	    sent_context: "SP and LS were talking about cakes and pies that LS had baked for their friend's birthday party.",
@@ -192,6 +202,7 @@ var sents = {
 	    LS: speakers10[0],
 	    AA: "cakes",
 	    BB: "pies",
+        AB: "cakes and pies"
 	}
     }
 };  
@@ -304,6 +315,7 @@ var experiment = {
 	    
 	    // Display the sentence stimuli
 	    $("#sent_context").html("<center>" + sent_materials[2] + "<center><br><br>");
+        $("#sent_QUD").html("<center><i>" + sent_materials[4] + " asked: </i> \"" + sent_materials[5] + "\"<center><br>");
 	    $("#speaker").html("<center><i>" + sent_materials[3] + " said to " + sent_materials[4] + ":</i></center>")
 	    $("#sent_utterance").html("<center><b>\"" +
 				      sent_materials[0] + "\"</b></center><br><br>");
