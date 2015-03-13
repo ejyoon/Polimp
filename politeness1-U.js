@@ -39,7 +39,7 @@ function shuffle (a)
 // substitution function - do we want to save all these factors to a data object? FIXME
 function doSentSubs (sents, scale, domain)
 {
-    inference = sents["scales"][scale]["sent_inference"];
+    inference = sents["scales"][scale]["sent_utterance"];
     question = sents["scales"][scale]["sent_question"];
     context = sents["domains"][domain]["sent_context"];
  
@@ -58,46 +58,70 @@ function doSentSubs (sents, scale, domain)
 
 
 // ############################## BP Changes Configuration settings ##############################
-speakers = shuffle([["John","Bob",], ["Chris","Sean"], ["Colin", "Kyle"], ["Carol", "Jane"], ["Katie", "Rose"], ["Mary", "Helen"]]);
-speakers1 = shuffle(speakers[0])
-speakers2 = shuffle(speakers[1])
-speakers3 = shuffle(speakers[2])
-speakers4 = shuffle(speakers[3])
-speakers5 = shuffle(speakers[4])
-speakers6 = shuffle(speakers[5])
+speakers = shuffle([["John","Bob",], ["Chris","Sean"], ["Colin", "Kyle"], ["Eric", "Tyler"], ["Aaron", "Bob"], ["Carol", "Jane"], ["Katie", "Rose"], ["Mary", "Helen"], ["Gina", "Ellen"], ["Hailey", "Mika"]]);
+speakers1 = shuffle(speakers[0]);
+speakers2 = shuffle(speakers[1]);
+speakers3 = shuffle(speakers[2]);
+speakers4 = shuffle(speakers[3]);
+speakers5 = shuffle(speakers[4]);
+speakers6 = shuffle(speakers[5]);
+speakers7 = shuffle(speakers[6]);
+speakers8 = shuffle(speakers[7]);
+speakers9 = shuffle(speakers[8]);
+speakers10 = shuffle(speakers[9]);
 
 
 var sents = {
     scales: {
 		training1: {
 		    sent_manipulation: null,
-		    sent_inference: "I like reading books.",
+		    sent_utterance: "I like reading books.",
 		    sent_question:  "SP also likes watching movies?"
 		},	
 	   training2: {
 		    sent_manipulation: null,
-		    sent_inference: "I don't like eating vegetables.",
+		    sent_utterance: "I don't like eating vegetables.",
 		    sent_question:  "SP doesn't like eating carrots?"
 		},	
         sayHAinferLB: {
             sent_manipulation: null,
-            sent_inference: "People hated your AA.", 
+            sent_utterance: "People hated your AA.", 
             sent_question: "people did not hate LS's BB?"
         },
         sayHAinferHB: {
             sent_manipulation: null,
-            sent_inference: "People hated your AA.", 
-            sent_question: "people also did not like LS's BB?"
+            sent_utterance: "People hated your BB.", 
+            sent_question: "people also did not like LS's AA?"
         },
         sayLAinferLB: {
             sent_manipulation: null,
-            sent_inference: "People loved your AA.", 
+            sent_utterance: "People loved your AA.", 
             sent_question: "people also liked LS's BB?"
         },
         sayLAinferHB: {
             sent_manipulation: null,
-            sent_inference: "People loved your AA.", 
-            sent_question: "people did not like LS's BB?"
+            sent_utterance: "People loved your BB.", 
+            sent_question: "people did not like LS's AA?"
+        },
+        saySomeHinferAllH: {
+            sent_manipulation: null,
+            sent_utterance: "Some people hated your AA.", 
+            sent_question: "no one liked LS's AA?"
+        },
+        saySomeHinferAllL: {
+            sent_manipulation: null,
+            sent_utterance: "Some people hated your BB.", 
+            sent_question: "someone liked LS's BB?"
+        },
+        saySomeLinferAllL: {
+            sent_manipulation: null,
+            sent_utterance: "Some people loved your AA.", 
+            sent_question: "everyone liked LS's AA?"
+        },
+        saySomeLinferAllH: {
+            sent_manipulation: null,
+            sent_utterance: "Some people loved your BB.", 
+            sent_question: "someone did not like LS's BB?"
         }
     },
     domains: {
@@ -134,12 +158,40 @@ var sents = {
 	    AA: "poems",
 	    BB: "stories",
 	},
-	drawings: {
+	books: {
 	    sent_context: "SP and LS were talking about books and movies that LS had recommended to people at a party.",
 	    SP: speakers6[1],
 	    LS: speakers6[0],
 	    AA: "book recommendations",
 	    BB: "movie recommendations",
+	},
+    handouts: {
+	    sent_context: "SP and LS were talking about handouts and activities that LS had made for teaching students in history class.",
+	    SP: speakers7[1],
+	    LS: speakers7[0],
+	    AA: "handouts",
+	    BB: "activities",
+	},
+    soup: {
+	    sent_context: "SP and LS were talking about soup and salad that LS had prepared for a dinner party.",
+	    SP: speakers8[1],
+	    LS: speakers8[0],
+	    AA: "soup",
+	    BB: "salad",
+	},
+    cards: {
+	    sent_context: "SP and LS were talking about cards and flowers that LS had prepared for a graduating class of students.",
+	    SP: speakers9[1],
+	    LS: speakers9[0],
+	    AA: "cards",
+	    BB: "flowers",
+	},
+    drawings: {
+	    sent_context: "SP and LS were talking about cakes and pies that LS had baked for their friend's birthday party.",
+	    SP: speakers10[1],
+	    LS: speakers10[0],
+	    AA: "cakes",
+	    BB: "pies",
 	}
     }
 };  
@@ -173,7 +225,7 @@ var experiment = {
 	scale: [],
 	domain: [],
 	sent_context: [],
-	sent_inference: [],
+	sent_utterance: [],
 	sent_question: [],
 	speaker: [],
 	judgment: [],
@@ -253,16 +305,16 @@ var experiment = {
 	    // Display the sentence stimuli
 	    $("#sent_context").html("<center>" + sent_materials[2] + "<center><br><br>");
 	    $("#speaker").html("<center><i>" + sent_materials[3] + " said to " + sent_materials[4] + ":</i></center>")
-	    $("#sent_inference").html("<center><b>\"" +
+	    $("#sent_utterance").html("<center><b>\"" +
 				      sent_materials[0] + "\"</b></center><br><br>");
-	    $("#sent_question").html("<center>Would you conclude from this sentence that<br><b>" +
+	    $("#sent_question").html("<center>Based on what " + sent_materials[3] + " said, would you conclude that<br><b>" +
 				     sent_materials[1] + "</b></center>");
 	    
 	    // push all relevant variables into data object	    
 	    experiment.data.scale.push(scale);
 	    experiment.data.domain.push(domain);
 	    experiment.data.sent_context.push(sent_materials[2]);
-	    experiment.data.sent_inference.push(sent_materials[0]);
+	    experiment.data.sent_utterance.push(sent_materials[0]);
 	    experiment.data.sent_question.push(sent_materials[1]);
 	    experiment.data.speaker.push(sent_materials[3]); 
 	    
