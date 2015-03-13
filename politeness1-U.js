@@ -58,89 +58,88 @@ function doSentSubs (sents, scale, domain)
 }
 
 
-//   context_pl = sents["domains"][scale]["sent_context_plural"]; //FIXME: unite context to one context, not divided by pl and sing
-   // context_sing = sents["domains"][scale]["sent_context_singular"];
-
-//   context_pl =
-//context_pl.replace("SP",SP).replace("SS",SS).replace("AA",AA).replace("BB",BB).replace("V1",V1).replace("V2",V2);
-    
-   // context_sing =
-//context_sing.replace("SP",SP).replace("SS",SS).replace("AA",AA).replace("BB",BB).replace("V1",V1).replace("V2",V2);
-    
-
 // ############################## BP Changes Configuration settings ##############################
+speakers = shuffle([["John","Bob",], ["Chris","Sean"], ["Colin", "Kyle"], ["Brian", "Peter"], ["Robert", "Philip"], ["Scott", "Michael"]]);
+speakers1 = shuffle(speakers[0])
+speakers2 = shuffle(speakers[1])
+speakers3 = shuffle(speakers[2])
+speakers4 = shuffle(speakers[3])
+speakers5 = shuffle(speakers[4])
+speakers6 = shuffle(speakers[5])
+
+
 var sents = {
     scales: {
 		training1: {
 		    sent_manipulation: null,
 		    sent_inference: "I like reading books.",
-		    sent_question:  "he likes watching movies?"
+		    sent_question:  "SP also likes watching movies?"
 		},	
 	   training2: {
 		    sent_manipulation: null,
 		    sent_inference: "I don't like eating carrots.",
-		    sent_question:  "he hates eating vegetables?"
+		    sent_question:  "SP hates eating vegetables?"
 		},	
         // FIXME: from here on, politeness sentences
         sayHAinferLB: {
             sent_manipulation: null,
             sent_inference: "People hated your AA.", 
-            sent_question: "people hated LS's AA but did not hate LS's BB?"
+            sent_question: "people did not hate LS's BB?"
         },
         sayHAinferHB: {
             sent_manipulation: null,
             sent_inference: "People hated your AA.", 
-            sent_question: "people hated LS's AA and hated LS's BB?"
+            sent_question: "people did not like LS's BB?"
         },
         sayLAinferLB: {
             sent_manipulation: null,
             sent_inference: "People loved your AA.", 
-            sent_question: "people loved LS's AA and loved LS's BB?"
+            sent_question: "people also liked LS's BB?"
         },
         sayLAinferHB: {
             sent_manipulation: null,
             sent_inference: "People loved your AA.", 
-            sent_question: "people loved LS's AA and did not love LS's BB?"
+            sent_question: "people did not like LS's BB?"
         }
     },
     domains: {
 	training1: {
-	    sent_context: "John and Bob were talking about their favorite pastimes.",
-        SP: "John",
-	    LS: "Bob",
+	    sent_context: "SP and LS were talking about their favorite pastimes.",
+        SP: speakers1[0],
+	    LS: speakers1[1],
 
 	},
 	training2: {
-	    sent_context: "John and Bob were talking about different kinds of food.",
-        SP: "Bob",
-	    LS: "John",
+	    sent_context: "SP and LS were talking about different kinds of food.",
+        SP: speakers2[1],
+	    LS: speakers2[0],
 
 	},
 	tea: {
 	    sent_context: "SP and LS were talking about cookies and tea that LS brought to a housewarming party yesterday.", // FIXME: for each context, need to (1) randomize who the speaker/listener is; 
-	    SP: "John",
-	    LS: "Bob",
+	    SP: speakers3[0],
+	    LS: speakers3[1],
 	    AA: "cookies",
 	    BB: "tea",
 	},
 	games: {
-	    sent_context: "SP and LS were talking about games and puzzles that LS had suggested for the welcome event at their company.",
-	    SP: "Bob",
-	    LS: "John",
+	    sent_context: "SP and LS were talking about games and puzzles that LS had suggested for a welcome event for their company.",
+	    SP: speakers4[0],
+	    LS: speakers4[1],
 	    AA: "games",
 	    BB: "puzzles",
 	},
 	poems: {
 	    sent_context: "SP and LS were talking about poems and stories that LS wrote and presented for his English class.",
-	    SP: "John",
-	    LS: "Bob",
+	    SP: speakers5[1],
+	    LS: speakers5[0],
 	    AA: "poems",
 	    BB: "stories",
 	},
 	drawings: {
 	    sent_context: "SP and LS were talking about books and movies that LS had recommended to people at a party.",
-	    SP: "Bob",
-	    LS: "John",
+	    SP: speakers6[1],
+	    LS: speakers6[0],
 	    AA: "book recommendations",
 	    BB: "movie recommendations",
 	}
@@ -149,7 +148,7 @@ var sents = {
 
 
 // Parameters for this participant
-var speakers = ["John","Bob"];
+
 var scales = Object.keys(sents.scales);
 var domains = Object.keys(sents.domains);
 
@@ -247,8 +246,6 @@ var experiment = {
 	    }
 	    
 	    // Generate the sentence stimuli 
-        // FIXME: should the speaker be John and Mary?
-	    speaker = shuffle(speakers)[0]
 
 	    //set sent_context
 //	   sent_context = sents["domains"][domain]["sent_context"];
@@ -260,8 +257,7 @@ var experiment = {
 	    $("#speaker").html("<center><i>" + sent_materials[3] + " said to " + sent_materials[4] + ":</i></center>")
 	    $("#sent_inference").html("<center><b>\"" +
 				      sent_materials[0] + "\"</b></center><br><br>");
-	    $("#sent_question").html("<center>Would you conclude from this sentence that, according to " +
-				     sent_materials[3] + ", <br><b>" +
+	    $("#sent_question").html("<center>Would you conclude from this sentence that<br><b>" +
 				     sent_materials[1] + "</b></center>");
 	    
 	    // push all relevant variables into data object	    
