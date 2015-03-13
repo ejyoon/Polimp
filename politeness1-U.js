@@ -37,7 +37,6 @@ function shuffle (a)
 }
 
 // substitution function - do we want to save all these factors to a data object? FIXME
-//Pass a trial object in to be populated?
 function doSentSubs (sents, scale, domain)
 {
     inference = sents["scales"][scale]["sent_inference"];
@@ -59,7 +58,7 @@ function doSentSubs (sents, scale, domain)
 
 
 // ############################## BP Changes Configuration settings ##############################
-speakers = shuffle([["John","Bob",], ["Chris","Sean"], ["Colin", "Kyle"], ["Brian", "Peter"], ["Robert", "Philip"], ["Scott", "Michael"]]);
+speakers = shuffle([["John","Bob",], ["Chris","Sean"], ["Colin", "Kyle"], ["Carol", "Jane"], ["Katie", "Rose"], ["Mary", "Helen"]]);
 speakers1 = shuffle(speakers[0])
 speakers2 = shuffle(speakers[1])
 speakers3 = shuffle(speakers[2])
@@ -77,10 +76,9 @@ var sents = {
 		},	
 	   training2: {
 		    sent_manipulation: null,
-		    sent_inference: "I don't like eating carrots.",
-		    sent_question:  "SP hates eating vegetables?"
+		    sent_inference: "I don't like eating vegetables.",
+		    sent_question:  "SP doesn't like eating carrots?"
 		},	
-        // FIXME: from here on, politeness sentences
         sayHAinferLB: {
             sent_manipulation: null,
             sent_inference: "People hated your AA.", 
@@ -89,7 +87,7 @@ var sents = {
         sayHAinferHB: {
             sent_manipulation: null,
             sent_inference: "People hated your AA.", 
-            sent_question: "people did not like LS's BB?"
+            sent_question: "people also did not like LS's BB?"
         },
         sayLAinferLB: {
             sent_manipulation: null,
@@ -116,7 +114,7 @@ var sents = {
 
 	},
 	tea: {
-	    sent_context: "SP and LS were talking about cookies and tea that LS brought to a housewarming party yesterday.", // FIXME: for each context, need to (1) randomize who the speaker/listener is; 
+	    sent_context: "SP and LS were talking about cookies and tea that LS brought to a housewarming party yesterday.", 
 	    SP: speakers3[0],
 	    LS: speakers3[1],
 	    AA: "cookies",
