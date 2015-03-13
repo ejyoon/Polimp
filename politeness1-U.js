@@ -86,43 +86,43 @@ var sents = {
 		    sent_question:  "SP doesn't like eating carrots?"
 		},	
         sayHAinferLB: {
-            sent_QUD: "Did people like my AB?",
+            sent_QUD: "How did people like my AB?",
             sent_utterance: "People hated your AA.", 
             sent_question: "people did not hate LS's BB?"
         },
         sayHAinferHB: {
-            sent_QUD: "Did people like my AB?",
+            sent_QUD: "How did people like my AB?",
             sent_utterance: "People hated your BB.", 
             sent_question: "people also did not like LS's AA?"
         },
         sayLAinferLB: {
-            sent_QUD: "Did people like my AB?",
+            sent_QUD: "How did people like my AB?",
             sent_utterance: "People loved your AA.", 
             sent_question: "people also liked LS's BB?"
         },
         sayLAinferHB: {
-            sent_QUD: "Did people like my AB?",
+            sent_QUD: "How did people like my AB?",
             sent_utterance: "People loved your BB.", 
             sent_question: "people did not like LS's AA?"
         },
         saySomeHinferAllH: {
-            sent_QUD: "Did people like my AA?",
+            sent_QUD: "How did people like my AA?",
             sent_utterance: "Some people hated your AA.", 
             sent_question: "no one liked LS's AA?"
         },
         saySomeHinferAllL: {
             sent_manipulation: null,
-            sent_QUD: "Did people like my BB?",
+            sent_QUD: "How did people like my BB?",
             sent_utterance: "Some people hated your BB.", 
             sent_question: "someone liked LS's BB?"
         },
         saySomeLinferAllL: {
-            sent_QUD: "Did people like my AA?",
+            sent_QUD: "How did people like my AA?",
             sent_utterance: "Some people loved your AA.", 
             sent_question: "everyone liked LS's AA?"
         },
         saySomeLinferAllH: {
-            sent_QUD: "Did people like my BB?",
+            sent_QUD: "How did people like my BB?",
             sent_utterance: "Some people loved your BB.", 
             sent_question: "someone did not like LS's BB?"
         }
@@ -314,8 +314,9 @@ var experiment = {
 	   sent_materials = doSentSubs(sents, scale, domain);	
 	    
 	    // Display the sentence stimuli
-	    $("#sent_context").html("<center>" + sent_materials[2] + "<center><br><br>");
-        $("#sent_QUD").html("<center><i>" + sent_materials[4] + " asked: </i> \"" + sent_materials[5] + "\"<center><br>");
+	    $("#sent_context").html("<center>" + sent_materials[2] + "<center><br>");
+	    $("#listener").html("<center><i>" + sent_materials[4] + " asked " + sent_materials[3] + ":</i></center>")
+        $("#sent_QUD").html("<center>\"<b>" + sent_materials[5] + "</b>\"<center><br>");
 	    $("#speaker").html("<center><i>" + sent_materials[3] + " said to " + sent_materials[4] + ":</i></center>")
 	    $("#sent_utterance").html("<center><b>\"" +
 				      sent_materials[0] + "\"</b></center><br><br>");
