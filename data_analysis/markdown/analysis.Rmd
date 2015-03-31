@@ -35,74 +35,69 @@ for (file.name in files) {
 
 levels(all.data$answer.scale) <- c("hateA_alsoHateB", "hateA_butLoveB", "loveA_butHateB", "loveA_alsoLoveB", "someHate_alsoAllHate", "someHate_butNotAllHate", "someLove_butNotAllLove", "someLove_alsoAllLove", "training1", "training2")
 levels(all.data$answer.judgment) <- c("No", "Maybe", "Yes")
+```
 
-# filter
+Filter out participants and clean up. 
+
+```{r}
 d <- all.data %>%
   select(subid, answer.scale, answer.judgment) %>%
+  rename(judgment = answer.judgment) %>%
   filter(answer.scale != "training1" & answer.scale != "training2") %>%
   separate(answer.scale, into = c("utterance", "inference"), sep = "_") 
 
 d$inference <- as.factor(d$inference)
 
 d <- d %>%
-  mutate(bound = substring(inference, 1, 3))
-d$bound <- as.factor(d$bound)
-levels(d$bound) <- c("lower", "upper")
+  mutate(bound = factor(substring(inference, 1, 3),
+                           levels = c("als", "but"),
+                           labels = c("also  (lower)", "but not  (upper)")),
+         scale = factor(as.numeric(grepl("some", utterance)), 
+                        levels = c(0, 1), 
+                        labels = c("ad-hoc","scalar")),
+         utt_valence = factor(as.numeric(grepl("love", utterance, 
+                                               ignore.case=TRUE)), 
+                            levels = c(0, 1), 
+                            labels = c("hate", "love")),
+         inf_valence = factor(as.numeric(grepl("love", inference, 
+                                               ignore.case=TRUE)), 
+                            levels = c(0, 1), 
+                            labels = c("hate", "love")),
+         condition = str_c(utt_valence, "-", inf_valence))
+```
 
-# histogram: rt
-qplot(answer.judgment, data = d, geom = "histogram") # across all cond
-qplot(answer.judgment, data = d, geom = "histogram") +
-  facet_wrap(utterance~inference, ncol=2) # across all cond
+Scalar inferences
+-----------------
 
-# bar graph
-levels(d$answer.judgment) <- c(-1, 0, 1)
-d$answer.judgment <- as.numeric(as.character(d$answer.judgment))
+Prediction - "but not all" infrence should be cancelled in the face-threatening context (hate-hate). In contrast, should be stronger in the love-love hypothesis
 
-# plot of the means
-mss <- d %>% 
-  group_by(utterance, bound, subid) %>%  
-  summarise(judgment = mean(answer.judgment), na.rm = TRUE)
+Not sure what the prediction is for the "also all" condition. Should probably be the flip? 
 
-ms <- mss %>% 
-  group_by(utterance, bound) %>%
-  summarise(judgment = mean(judgment), na.rm = TRUE)
+```{r}
+qplot(judgment, fill = condition, position = "dodge", 
+      data = filter(d, scale == "scalar")) + 
+  facet_grid(~bound)
+```
 
+We find little support for this hypothesis, but there is a trend in this direction, perhaps. 
 
-ms$cih <- aggregate(judgment ~ utterance + bound, mss, ci.high)$judgment
-ms$cil <- aggregate(judgment ~ utterance + bound, mss, ci.low)$judgment
+Ad hocs
+-------
 
-ms$utterance <- as.factor(ms$utterance)
-levels(ms$utterance) <- c("\"people hated A\" -> infer about B?", "\"people loved A\" -> infer about B?", "\"some hated A\" -> infer about all?", "\"some loved A\" -> infer about all?")
-levels(ms$bound) <- c("also ~", "not ~")
+Prediction - in face-threatening context, inference should be cancelled. So:
 
-p1 <- ggplot(data = ms,
-             aes(x=bound, y=judgment, fill=bound)) +
-  geom_bar(stat="identity", position=position_dodge()) +
-  facet_wrap(~utterance) +
-  geom_errorbar(aes(ymin=judgment-cil, ymax=judgment+cih),
-                width=.2,
-                position=position_dodge(.9)) +
-  xlab("Inference") + 
-  ylab("Judgment that inference is correct") +
-  ggtitle("Judgments for sentence interpretation")
-p1
+* hateA should not imply ~hateB (because they could have hated both, but you didn't want to say)
+* loveA should more strongly imply ~loveB (because if they have loved both it would have been nice to say so)
+* hateA should imply ~loveB (because you could have said something nicer)
+* loveA should not imply ~hateB (because it wouldn't be nice to say so). 
 
-mss$utterance <- as.factor(ms$utterance)
-levels(mss$utterance) <- c("\"people hated A\" -> infer about B?", "\"people loved A\" -> infer about B?", "\"some hated A\" -> infer about all?", "\"some loved A\" -> infer about all?")
-levels(mss$bound) <- c("also ~", "not ~")
+```{r}
+qplot(judgment, fill = bound, position = "dodge", 
+      data = filter(d, scale == "ad-hoc")) + 
+  facet_grid(~condition)
+```
 
-p1 <- ggplot(data = mss,
-             aes(x=judgment)) +
-  geom_histogram(binwidth=1, , origin = -1.5) +
-  facet_grid(utterance~bound) +
-  #geom_errorbar(aes(ymin=judgment-cil, ymax=judgment+cih),
-                #width=.2,
-                #position=position_dodge(.9)) +
-  xlab("Inference") + 
-  ylab("Judgment that inference is correct") +
-  ggtitle("Judgments for sentence interpretation")
-p1
-
+These predictions aren't exactly satisfied, but certainly the number of "maybes" is very different in the love scenarios than the hate scenarios. 
 
 
 
