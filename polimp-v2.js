@@ -120,13 +120,13 @@ var sents = {
 
 	},
 	training2: {
-	    sent_context: "Imagine that you and SP were talking about different kinds of food.",
+	    sent_context: "Imagine that you and your friend SP were talking about different kinds of food.",
         SP: speakers2[1],
 	    LS: speakers2[0],
 
 	},
 	tea: {
-	    sent_context: "Imagine that you and SP were talking about cookies and tea that you had brought to a housewarming party yesterday.", 
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had brought to a housewarming party yesterday.", 
 	    SP: speakers3[0],
 	    LS: speakers3[1],
 	    AA: "cookies",
@@ -134,15 +134,15 @@ var sents = {
         AB: "cookies and tea"
 	},
 	games: {
-	    sent_context: "Imagine that you and SP were talking about games and puzzles that you had suggested for a welcome event for their company.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had suggested for a welcome event for their company.",
 	    SP: speakers4[0],
 	    LS: speakers4[1],
-	    AA: "games",
-	    BB: "puzzles",
+	    AA: "puzzles",
+	    BB: "games",
         AB: "games and puzzles"        
 	},
 	poems: {
-	    sent_context: "Imagine that you and SP were talking about poems and stories that you had written and presented for your English class.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had written and presented for your English class.",
 	    SP: speakers5[1],
 	    LS: speakers5[0],
 	    AA: "poems",
@@ -150,7 +150,7 @@ var sents = {
         AB: "poems and stories"
 	},
 	books: {
-	    sent_context: "Imagine that you and SP were talking about books and movies that you had recommended to people at a party.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had recommended to people at a party.",
 	    SP: speakers6[1],
 	    LS: speakers6[0],
 	    AA: "book recommendations",
@@ -158,7 +158,7 @@ var sents = {
         AB: "book and movie recommendations"
 	},
     handouts: {
-	    sent_context: "Imagine that you and SP were talking about handouts and activities that you had made for teaching students in history class.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had made for teaching students in history class.",
 	    SP: speakers7[1],
 	    LS: speakers7[0],
 	    AA: "handouts",
@@ -166,7 +166,7 @@ var sents = {
         AB: "handouts and activities"
 	},
     soup: {
-	    sent_context: "Imagine that you and SP were talking about soup and salad that you had prepared for a dinner party.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had prepared for a dinner party.",
 	    SP: speakers8[1],
 	    LS: speakers8[0],
 	    AA: "soup",
@@ -174,7 +174,7 @@ var sents = {
         AB: "soup and salad"
 	},
     cards: {
-	    sent_context: "Imagine that you and SP were talking about cards and flowers that you had prepared for a graduating class of students.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had prepared for a graduating class of students.",
 	    SP: speakers9[1],
 	    LS: speakers9[0],
 	    AA: "cards",
@@ -182,7 +182,7 @@ var sents = {
         AB: "cards and flowers"
 	},
     drawings: {
-	    sent_context: "Imagine that you and SP were talking about cakes and pies that you had baked for your friend's birthday party.",
+	    sent_context: "Imagine that you and your friend SP were talking about BB that you had baked for your friend's birthday party.",
 	    SP: speakers10[1],
 	    LS: speakers10[0],
 	    AA: "cakes",
