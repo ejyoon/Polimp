@@ -12,8 +12,9 @@ body {
 
 /* We manage display using "slides". A slide is a <code>div</code> that takes up the entire page. Only one slide should be visible at a time. Navigation between slides is most sensibly accomplished using using buttons, rather than keyboard events. */
 .slide {
-	width: 95%;
-	height: 95%;
+    text-align: center;
+	width: 90%;
+	height: 90%;
 	display: none;
 	position: absolute;
 	margin: 0;
