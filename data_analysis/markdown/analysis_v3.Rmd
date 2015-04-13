@@ -1,18 +1,21 @@
 ---
-title: "polimp_analysis"
+title: "polimp ver 3 analysis"
 author: "EJY, MCF"
 date: "April 1, 2015"
 output: html_document
 ---
+
+Ver 3: "some people liked / didn't like your poem" -> "do you think it is possible that everyone liked / no one liked your poem?"
 
 ```{r warning=FALSE, message=FALSE}
 rm(list = ls())
 library(jsonlite)
 library(ggplot2)
 library(tidyr)
-source("../helper/useful.R")
+library(binom)
+source("/Users/ericang/Documents/Research/Politeness/experiment/2_code/data_analysis/helper/useful.R")
 
-raw.data.path <- "../../production-results/"
+raw.data.path <- "/Users/ericang/Documents/Research/Politeness/experiment/2_code/production-results/v3/"
 
 ## LOOP TO READ IN FILES
 all.data <- data.frame()
@@ -59,33 +62,32 @@ d1 <- d %>%
          condition = str_c(utt_valence, "-", inference))
 
 qplot(judgment, fill = condition, position = "dodge", 
-      data = filter(d1, scale == "scalar")) + 
-  facet_grid(~bound)
+      data = filter(d1, scale == "scalar")) +
+  ggtitle("Judgment for 'possible that all hate/love'")
 ```
 
 ```{r}
-# proportions
-d1$possible <- d1$judgment
-levels(d1$possible) <- c(0, 1)
-d1$possible <- as.numeric(as.character(d1$possible))
+ms <- d1 %>%
+  group_by(condition) %>%
+  mutate(n.total = n()) %>%
+  group_by(condition, judgment) %>%
+  summarize(n = n(),
+            n.total = n.total[1],
+            mean = n / n.total,
+            cih = binom.bayes(n, n.total)$lower,
+            cil = binom.bayes(n, n.total)$upper)
 
-mss <- aggregate(possible ~ condition + subid, subset(d1, scale == "scalar"), mean)
-ms <- aggregate(possible ~ condition, subset(d1, scale == "scalar"), mean)
-ms$cih <- aggregate(possible ~ condition, mss, ci.high)$possible
-ms$cil <- aggregate(possible ~ condition, mss, ci.low)$possible
-
-qplot(condition, possible, fill=condition, stat="identity",
-      geom="bar", ylim=c(0,1),
-      data = ms) +
-    geom_errorbar(aes(ymin=possible-cil,ymax=possible+cih,width=.2)) +
-  ylab("Proportion \"Possible\" responses")
+qplot(condition, mean, ymax=cih, ymin=cil, 
+      fill = judgment, 
+      stat="identity", position=position_dodge(width=.9),
+      geom=c("bar","linerange"),
+      data=ms) + 
+  ylab("Proportion of judgments") + 
+  ylim(c(0,1)) + 
+  geom_hline(yintercept=.5, lty=2)
 ```
 
 ```{r}
-# chi-square - hate vs. love
-data_summary <- matrix(c(28, 36, 22, 14), nrow = 2, ncol = 2, byrow=FALSE, dimnames = list(c("hate","love"), c("no","yes")))
-chisq.test(data_summary)
-
-# wilcox test (Bonnefon used this?): whether distribution of responses is identical in the two conditions
-wilcox.test(possible ~ condition, data=d1)
+d_table <- table(d1$condition, d1$judgment)
+chisq.test(d_table)
 ```
