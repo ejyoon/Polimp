@@ -15,33 +15,55 @@ library(tidyr)
 library(binom)
 source("/Users/ericang/Documents/Research/Politeness/experiment/2_code/data_analysis/helper/useful.R")
 
-raw.data.path <- "/Users/ericang/Documents/Research/Politeness/experiment/2_code/production-results/v4/"
+raw.data.path <- "/Users/ericang/Documents/Research/Politeness/experiment/2_code/production-results/"
 
 ## LOOP TO READ IN FILES
-all.data <- data.frame()
-files <- dir(raw.data.path,pattern="*.json")
+v3 <- data.frame()
+files <- dir(paste0(raw.data.path,"v3/"),pattern="*.json")
 
 for (file.name in files) {
   print(file.name)
   
   ## these are the two functions that are most meaningful
-  json_file <- readLines(paste(raw.data.path,file.name,sep=""))
+  json_file <- readLines(paste(raw.data.path,"v3/",file.name,sep=""))
   json_file_str = paste(json_file, collapse = "")
   json_file_str = gsub(",}", "}", json_file_str)
   jso = jsonlite::fromJSON(json_file_str)
   jso1 <- data.frame(jso)
   jso1$subid <- substring(file.name, 1, 6)
+  jso1$expt <- "v3"
   
   ## now here's where data get bound together
-  all.data <- rbind(all.data, jso1)
+  v3 <- rbind(v3, jso1)
 }
+
+v4 <- data.frame()
+files <- dir(paste0(raw.data.path,"/v4"),pattern="*.json")
+
+for (file.name in files) {
+  print(file.name)
+  
+  ## these are the two functions that are most meaningful
+  json_file <- readLines(paste(raw.data.path,"v4/",file.name,sep=""))
+  json_file_str = paste(json_file, collapse = "")
+  json_file_str = gsub(",}", "}", json_file_str)
+  jso = jsonlite::fromJSON(json_file_str)
+  jso1 <- data.frame(jso)
+  jso1$subid <- substring(file.name, 1, 6)
+  jso1$expt <- "v4"
+  
+  ## now here's where data get bound together
+  v4 <- rbind(v4, jso1)
+}
+
+all.data <- rbind(v3, v4)
 ```
 
 Filter out participants and clean up.
 
 ```{r}
 d <- all.data %>%
-  select(subid, answer.scale, answer.judgment) %>%
+  select(subid, expt, answer.scale, answer.judgment) %>%
   rename(judgment = answer.judgment) %>%
   filter(answer.scale != "training1" & answer.scale != "training2") %>%
   separate(answer.scale, into = c("utterance", "inference"), sep = "_") 
@@ -60,17 +82,13 @@ d1 <- d %>%
                             levels = c(0, 1), 
                             labels = c("hate", "love")),
          condition = str_c(utt_valence, "-", inference))
-
-qplot(judgment, fill = condition, position = "dodge", 
-      data = filter(d1, scale == "scalar")) +
-  ggtitle("Judgment for 'possible that all hate/love'")
 ```
 
 ```{r}
 ms <- d1 %>%
-  group_by(condition) %>%
+  group_by(expt, condition) %>%
   mutate(n.total = n()) %>%
-  group_by(condition, judgment) %>%
+  group_by(expt, condition, judgment) %>%
   summarize(n = n(),
             n.total = n.total[1],
             mean = n / n.total,
@@ -82,14 +100,23 @@ qplot(condition, mean, ymax=cih, ymin=cil,
       stat="identity", position=position_dodge(width=.9),
       geom=c("bar","linerange"),
       data=ms) + 
+  facet_wrap(~expt) +
   ylab("Proportion of judgments") + 
   ylim(c(0,1)) + 
   geom_hline(yintercept=.5, lty=2) +
   ggtitle("liked vs. disliked") +
-  scale_x_discrete(labels=c("some dislike, possible that everyone dislike?", "some like, possible that everyone like?"))
+  scale_x_discrete(labels=
+                     c("some dislike-> 
+                       everyone dislike?", 
+                       "some like-> 
+                       everyone like?"))
 ```
 
 ```{r}
 d_table <- table(d1$condition, d1$judgment)
 chisq.test(d_table)
+
+# a mixed model predicting participants' response as a function of condition and experiment
+lmer <- glmer(judgment ~ expt * condition + (condition|subid), family=binomial, data=d1)
+summary(lmer)
 ```
