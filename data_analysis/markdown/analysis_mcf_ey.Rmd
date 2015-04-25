@@ -12,7 +12,7 @@ library(ggplot2)
 library(tidyr)
 source("../helper/useful.R")
 
-raw.data.path <- "../../production-results/"
+raw.data.path <- "../../production-results/v2"
 
 ## LOOP TO READ IN FILES
 all.data <- data.frame()

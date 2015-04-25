@@ -1,18 +1,25 @@
 ---
-title: "polimp_analysis"
+title: "polimp ver 5 analysis"
 author: "EJY, MCF"
-date: "April 1, 2015"
+date: "April 20, 2015"
 output: html_document
 ---
+
+Ver 5: 
+
+valence: "some people liked / didn't like your poem" -> "do you think it is possible that everyone liked / didn't like your poem?"
+
+utterance: utterance (after reading the note) vs. no utterance (before reading the note)
 
 ```{r warning=FALSE, message=FALSE}
 rm(list = ls())
 library(jsonlite)
 library(ggplot2)
 library(tidyr)
+library(binom)
 source("/Users/ericang/Documents/Research/Politeness/experiment/2_code/data_analysis/helper/useful.R")
 
-raw.data.path <- "/Users/ericang/Documents/Research/Politeness/experiment/2_code/production-results/bonnefon_rp/"
+raw.data.path <- "/Users/ericang/Documents/Research/Politeness/experiment/2_code/production-results/v5/"
 
 ## LOOP TO READ IN FILES
 all.data <- data.frame()
@@ -41,9 +48,10 @@ d <- all.data %>%
   select(subid, answer.scale, answer.judgment) %>%
   rename(judgment = answer.judgment) %>%
   filter(answer.scale != "training1" & answer.scale != "training2") %>%
-  separate(answer.scale, into = c("utterance", "inference"), sep = "_") 
+  separate(answer.scale, into = c("utterance", "inference", "context"), sep = "_") 
 
 d$inference <- as.factor(d$inference)
+d$context <- as.factor(d$context)
 
 d1 <- d %>%
   mutate(bound = factor(substring(inference, 1, 3),
@@ -55,20 +63,15 @@ d1 <- d %>%
          utt_valence = factor(as.numeric(grepl("love", utterance, 
                                                ignore.case=TRUE)), 
                             levels = c(0, 1), 
-                            labels = c("hate", "love")),
-         condition = str_c(utt_valence, "-", inference))
-
-qplot(judgment, fill = condition, position = "dodge", 
-      data = filter(d1, scale == "scalar")) + 
-  facet_grid(~bound)
+                            labels = c("didnt_like", "like")),
+         condition = str_c(utt_valence, "-", inference, "-", context))
 ```
 
 ```{r}
-# proportions
 ms <- d1 %>%
-  group_by(utt_valence) %>%
+  group_by(utt_valence, context) %>%
   mutate(n.total = n()) %>%
-  group_by(utt_valence, judgment) %>%
+  group_by(utt_valence, context, judgment) %>%
   summarize(n = n(),
             n.total = n.total[1],
             mean = n / n.total,
@@ -76,23 +79,18 @@ ms <- d1 %>%
             cil = binom.bayes(n, n.total)$upper)
 
 qplot(utt_valence, mean, ymax=cih, ymin=cil, 
-      fill=utt_valence,
+      fill = context, 
       stat="identity", position=position_dodge(width=.9),
       geom=c("bar","linerange"),
       data=subset(ms, judgment == "yes")) + 
   xlab("Valence") +
-  ylab("Proportion of judgments") + 
-  #scale_fill_continuous(guide=NULL) +
+  ylab("Proportion of judgments 'possible that all'") + 
   ylim(c(0,1)) + 
   geom_hline(yintercept=.5, lty=2) +
-  ggtitle("Bonnefon Replication: 'possible that everyone'")
+  ggtitle("Utterance x Valence")
 ```
 
 ```{r}
-# chi-square - hate vs. love
-data_summary <- matrix(c(28, 36, 22, 14), nrow = 2, ncol = 2, byrow=FALSE, dimnames = list(c("hate","love"), c("no","yes")))
-chisq.test(data_summary)
-
-# wilcox test (Bonnefon used this?): whether distribution of responses is identical in the two conditions
-wilcox.test(possible ~ condition, data=d1)
+lmer <- glmer(judgment ~ utt_valence * context + (utt_valence | subid), data=d1, family=binomial)
+summary(lmer)
 ```
