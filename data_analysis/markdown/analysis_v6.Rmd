@@ -1,0 +1,113 @@
+---
+title: "polimp ver 6 analysis"
+author: "EJY, MCF"
+date: "April 27, 2015"
+output: html_document
+---
+
+Ver 6: 
+
+some people liked / didn't like -> likely that everyone liked/didn't like?
+likert scale
+3 conds: utterance, no utterance, smudge
+
+```{r warning=FALSE, message=FALSE}
+rm(list = ls())
+library(jsonlite)
+library(ggplot2)
+library(tidyr)
+library(binom)
+source("/Users/ericang/Documents/Research/Politeness/experiment/2_code/data_analysis/helper/useful.R")
+
+raw.data.path <- "/Users/ericang/Documents/Research/Politeness/experiment/2_code/production-results/v6/"
+
+
+## LOOP TO READ IN FILES
+all.data <- data.frame()
+files <- dir(raw.data.path,pattern="*.json")
+
+for (file.name in files) {
+  print(file.name)
+  
+  ## these are the two functions that are most meaningful
+  json_file <- readLines(paste(raw.data.path,file.name,sep=""))
+  json_file_str = paste(json_file, collapse = "")
+  json_file_str = gsub(",}", "}", json_file_str)
+  jso = jsonlite::fromJSON(json_file_str)
+  jso1 <- data.frame(jso)
+  jso1$subid <- substring(file.name, 1, 6)
+  
+  ## now here's where data get bound together
+  all.data <- rbind(all.data, jso1)
+}
+```
+
+Filter out participants and clean up.
+
+```{r}
+exc <- all.data %>% filter(answer.scale == "training1" & answer.judgment != "0")
+exc2 <- all.data %>% filter(answer.scale == "training2" & answer.judgment != "6")
+d <- all.data[!all.data$subid %in% exc$subid,]
+d <- all.data[!all.data$subid %in% exc2$subid,]
+
+d <- d %>%
+  select(subid, answer.scale, answer.judgment) %>%
+  rename(judgment = answer.judgment) %>%
+  filter(answer.scale != "training1" & answer.scale != "training2") %>%
+  separate(answer.scale, into = c("utterance", "inference", "context"), sep = "_") 
+
+d$inference <- as.factor(d$inference)
+d$context <- as.factor(d$context)
+
+d1 <- d %>%
+  mutate(bound = factor(substring(inference, 1, 3),
+                           levels = c("and", "but"),
+                           labels = c("lower", "upper")),
+         scale = factor(as.numeric(grepl("some", utterance)), 
+                        levels = c(0, 1), 
+                        labels = c("ad-hoc","scalar")),
+         utt_valence = factor(as.numeric(grepl("love", utterance, 
+                                               ignore.case=TRUE)), 
+                            levels = c(0, 1), 
+                            labels = c("didnt_like", "like")),
+         condition = str_c(utt_valence, "-", inference, "-", context))
+```
+
+```{r}
+d1$judgment <- as.numeric(d1$judgment)
+
+## for bootstrapping 95% confidence intervals
+theta <- function(x,xdata,na.rm=T) {mean(xdata[x],na.rm=na.rm)}
+ci.low <- function(x,na.rm=T) {
+  mean(x,na.rm=na.rm) - quantile(bootstrap(1:length(x),1000,theta,x,na.rm=na.rm)$thetastar,.025,na.rm=na.rm)}
+ci.high <- function(x,na.rm=T) {
+  quantile(bootstrap(1:length(x),1000,theta,x,na.rm=na.rm)$thetastar,.975,na.rm=na.rm) - mean(x,na.rm=na.rm)}
+
+
+ms <- d1 %>%
+#  group_by(utt_valence, context) %>%
+#  mutate(n.total = n()) %>%
+  group_by(utt_valence, context) %>%
+  summarize(
+            mean = mean(judgment),
+            cih = ci.low(judgment),
+            cil = ci.high(judgment))
+levels(ms$context) <- c("no utterance", "smudged word", "utterance")
+
+
+qplot(utt_valence, mean, ymax=mean+cih, ymin=mean-cil, 
+      fill = context, 
+      stat="identity", position=position_dodge(width=.9),
+      geom=c("bar","linerange"),
+      data=ms) + 
+  xlab("Valence") +
+  #ylab("Proportion of judgments 'possible that all'") + 
+  #ylim(c(0,1)) + 
+  geom_hline(yintercept=3, lty=2) +
+  ggtitle("Utterance x Valence")
+```
+
+```{r}
+lmer <- lmer(judgment ~ utt_valence * context + (utt_valence + context | subid), data=d1)
+summary(lmer)
+```

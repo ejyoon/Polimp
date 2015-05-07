@@ -1,0 +1,7 @@
+"","utt_valence","context","mean","cih","cil"
+"1","didnt_like","no utterance",3.8875,0.4,0.399999999999999
+"2","didnt_like","smudged word",3.975,0.4125,0.45
+"3","didnt_like","utterance",3.95,0.4378125,0.462499999999999
+"4","like","no utterance",4.1625,0.375,0.375
+"5","like","smudged word",4.6,0.3125,0.3125
+"6","like","utterance",3.625,0.4875,0.4625

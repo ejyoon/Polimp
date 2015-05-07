@@ -90,32 +90,46 @@ var sents = {
             sent_prequestion: "From what your friend told you,"
 		},	
         
-        someHate_andAlsAll_utterance: {
+        someHate_andAlsAll_utt: {
             sent_QUD: "How did people like my BB?",
             sent_utterance: ", which says: 'Some people didn't like your BB.'", 
             sent_question: "everyone didn't like your BB?",
             sent_prequestion: "From what your friend wrote to you,"
         },
         
-        someLove_andAlsAll_utterance: {
+        someLove_andAlsAll_utt: {
             sent_QUD: "How did people like my BB?",
             sent_utterance: ", which says: 'Some people liked your BB.'", 
             sent_question: "everyone liked your BB?",
             sent_prequestion: "From what your friend wrote to you,"
         },
         
-        someHate_andAlsAll_noUtterance: {
+        someHate_andAlsAll_noUtt: {
             sent_QUD: "How did people like my BB?",
             sent_utterance: ".", 
             sent_question: "everyone didn't like your BB?",
             sent_prequestion: "Before reading the note,"
         },
         
-        someLove_andAlsAll_noUtterance: {
+        someLove_andAlsAll_noUtt: {
             sent_QUD: "How did people like my BB?",
             sent_utterance: ".", 
             sent_question: "everyone liked your BB?",
             sent_prequestion: "Before reading the note,"
+        },
+
+       someHate_andAlsAll_smudge: {
+            sent_QUD: "How did people like my BB?",
+            sent_utterance: ", which says: '... didn't like your BB.' (you can't read the first word(s) because it was smudged by accident)", 
+            sent_question: "everyone didn't like your BB?",
+            sent_prequestion: "Based on what you can read from your friend's note,"
+        },
+        
+        someLove_andAlsAll_smudge: {
+            sent_QUD: "How did people like my BB?",
+            sent_utterance: ", which says: '... liked your BB.' (you can't read the first word(s) because it was smudged by accident)", 
+            sent_question: "everyone liked your BB?",
+            sent_prequestion: "Based on what you can read from your friend's note,"
         }
 
     },
@@ -164,7 +178,25 @@ var sents = {
 	    AA: "puzzles",
 	    BB: "film",
         AB: "games and puzzles"        
-	}
+	},
+    dance: {
+	    sent_context: "Imagine that you and your friend have joined a dance club, with four members in addition to you and your friend. Each week, one member of the club shows their own choreographed dance, and the five other members discuss the dance in the absence of its choreographer. Then you get a score based on the group evaluation of the dance. This week, it is your turn to do a dance choreography and to let others discuss it. After the discussion, before you find out about your score, your friend confides to you something by passing you a note he wrote", 
+	    SP: "your friend",
+	    LS: speakers3[1],
+	    AA: "cookies",
+	    BB: "dance",
+        AB: "cookies and tea"
+        
+	},
+	paiting: {
+	    sent_context: "Imagine that you and your friend have joined a painting club, with four members in addition to you and your friend. Each week, one member of the club brings in their painting, and the five other members discuss the painting in the absence of the artist. Then you get a score based on the group evaluation of the painting. This week, it is your turn to paint and to let others discuss your painting. After the discussion, before you find out about your score, your friend confides to you something by passing you a note he wrote", 
+	    SP: "your friend",
+	    LS: speakers3[1],
+	    AA: "cookies",
+	    BB: "painting",
+        AB: "cookies and tea"
+        
+	},
     }
 };  
 
@@ -276,8 +308,8 @@ var experiment = {
 	    
 	    // Display the sentence stimuli
 	    $("#sent_context").html(sent_materials[2] + sent_materials[0] + "<br>");
-	    $("#sent_question").html("<center>" + sent_materials[6] + " do you think it is possible that " +
-				     sent_materials[1] + "</center>");
+	    $("#sent_question").html(sent_materials[6] + " how likely do you think it is that " +
+				     sent_materials[1]);
 	    
 	    // push all relevant variables into data object	    
 	    experiment.data.scale.push(scale);
